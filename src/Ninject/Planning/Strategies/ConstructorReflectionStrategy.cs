@@ -74,8 +74,22 @@ namespace Ninject.Planning.Strategies
 
             foreach (var constructor in constructors)
             {
-                var directive = new ConstructorInjectionDirective(constructor, this.injectorFactory.Create(constructor));
-                plan.Add(directive);
+                bool isConstructorSupported = true;
+
+                foreach (var parameter in constructor.GetParameters())
+                {
+                    if (parameter.ParameterType.IsPointer)
+                    {
+                        isConstructorSupported = false;
+                        break;
+                    }
+                }
+
+                if (isConstructorSupported)
+                {
+                    var directive = new ConstructorInjectionDirective(constructor, this.injectorFactory.Create(constructor));
+                    plan.Add(directive);
+                }
             }
         }
     }
